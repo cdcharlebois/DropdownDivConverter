@@ -145,9 +145,21 @@ define([
 
                 // set action for the normal dropdown button
                 this.connect(this.dropdownButton, "click", lang.hitch(this,function(e){
-                    //event.stop(e);
+                    event.stop(e);
                     var dropdown = null;
                     this._toggleMenu();
+
+                    var allElements = dijit.registry.toArray();
+                    for (var i = 0; i < allElements.length; i++) {
+                        if (allElements[i].id != this.id) { 
+                            if (allElements[i]._isOpen) {
+                                if (allElements[i].id.match(/DropdownDivConverter.*/)) {
+                                    allElements[i]._toggleMenu();
+                                }
+                            }
+                        }
+                    }
+
                 }));
 
                 // prevent default closing on dropdownMenu if needed
