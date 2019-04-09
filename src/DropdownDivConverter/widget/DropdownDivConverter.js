@@ -146,20 +146,18 @@ define([
                 // set action for the normal dropdown button
                 this.connect(this.dropdownButton, "click", lang.hitch(this,function(e){
                     event.stop(e);
-                    var dropdown = null;
+                    //var dropdown = null;
                     this._toggleMenu();
 
-                    var allElements = dijit.registry.toArray();
-                    for (var i = 0; i < allElements.length; i++) {
-                        if (allElements[i].id != this.id) { 
-                            if (allElements[i]._isOpen) {
-                                if (allElements[i].id.match(/DropdownDivConverter.*/)) {
-                                    allElements[i]._toggleMenu();
+                    dijit.registry.toArray().forEach(function (element) {
+                        if (element.id.match(/DropdownDivConverter.*/)) {
+                            if (element.id != this.id) {
+                                if (element._isOpen) {
+                                    element._toggleMenu();
                                 }
                             }
                         }
-                    }
-
+                    }.bind(this));
                 }));
 
                 // prevent default closing on dropdownMenu if needed
@@ -246,6 +244,7 @@ define([
             } else {
                 domClass.add(this.domNode,"open");
                 this._isOpen = true;
+                this._scrollIfOffScreen();
             }
         },
 
@@ -320,6 +319,16 @@ define([
             logger.debug(this.id + "._executeCallback" + (from ? " from " + from : ""));
             if (cb && typeof cb === "function") {
                 cb();
+            }
+        },
+
+        _scrollIfOffScreen: function () {
+            var rect = this.domNode.lastElementChild.getBoundingClientRect();
+            var viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
+            if (rect.bottom - viewHeight >= 0) {
+                this.domNode.lastElementChild.scrollIntoView(false);
+            } else if (rect.top < 0) {
+                this.domNode.lastElementChild.scrollIntoView();
             }
         }
     });
